@@ -16,7 +16,7 @@ if (fs.existsSync(distDir)) {
 }
 fs.mkdirSync(distDir, { recursive: true });
 
-// Step 2: Compile TypeScript files
+// Step 2: Compile TypeScript files (background, content, utils)
 try {
   console.log('📝 Compiling TypeScript files...');
   execSync('npx tsc', { stdio: 'inherit' });
@@ -26,14 +26,22 @@ try {
   process.exit(1);
 }
 
-// Step 3: Build React popup (if needed)
+// Step 3: Build React popup with Vite
 try {
-  console.log('⚛️  Building React popup...');
-  // For now, we'll just copy the TSX file and let it be compiled by TypeScript
-  // In a more complex setup, you might want to use a bundler like Vite or Webpack
-  console.log('✅ React popup processed');
+  console.log('⚛️  Building React popup with Vite...');
+  execSync('npx vite build', { stdio: 'inherit' });
+  // Move dist/index.html to dist/popup/index.html
+  const popupHtmlSrc = path.join(distDir, 'index.html');
+  const popupHtmlDestDir = path.join(distDir, 'popup');
+  const popupHtmlDest = path.join(popupHtmlDestDir, 'index.html');
+  if (fs.existsSync(popupHtmlSrc)) {
+    fs.mkdirSync(popupHtmlDestDir, { recursive: true });
+    fs.renameSync(popupHtmlSrc, popupHtmlDest);
+    console.log('✅ Moved popup HTML to dist/popup/index.html');
+  }
+  console.log('✅ React popup built with Vite');
 } catch (error) {
-  console.error('❌ React build failed:', error.message);
+  console.error('❌ React popup build failed:', error.message);
   process.exit(1);
 }
 
@@ -41,28 +49,22 @@ try {
 console.log('📋 Copying manifest.json...');
 fs.copyFileSync('manifest.json', path.join(distDir, 'manifest.json'));
 
-// Step 5: Copy popup HTML
-console.log('🪟 Copying popup files...');
-const popupDir = path.join(distDir, 'popup');
-fs.mkdirSync(popupDir, { recursive: true });
-fs.copyFileSync('popup/index.html', path.join(popupDir, 'index.html'));
-
-// Step 6: Copy content CSS files
+// Step 5: Copy content CSS files
 console.log('🎨 Copying content CSS files...');
 const contentDir = path.join(distDir, 'content');
 if (fs.existsSync('content/overlay.css')) {
   fs.copyFileSync('content/overlay.css', path.join(contentDir, 'overlay.css'));
 }
 
-// Step 7: Copy public assets
+
+
+// Step 6: Copy public assets
 console.log('🖼️  Copying public assets...');
-const publicDir = path.join(distDir, 'public');
-fs.mkdirSync(publicDir, { recursive: true });
 if (fs.existsSync('public/icon.png')) {
-  fs.copyFileSync('public/icon.png', path.join(publicDir, 'icon.png'));
+  fs.copyFileSync('public/icon.png', path.join(distDir, 'icon.png'));
 }
 
-// Step 8: Verify build output
+// Step 7: Verify build output
 console.log('\n📁 Verifying build output...');
 const expectedFiles = [
   'manifest.json',
@@ -72,8 +74,9 @@ const expectedFiles = [
   'content/capture.js',
   'content/geminiAnalyzer.js',
   'popup/index.html',
-  'popup/App.js',
-  'utils/drawAnnotations.js'
+  'popup/popup.js',
+  'utils/drawAnnotations.js',
+  'icon.png'
 ];
 
 let missingFiles = [];
@@ -91,7 +94,7 @@ if (missingFiles.length > 0) {
 
 console.log('✅ All expected files present');
 
-// Step 9: Display final structure
+// Step 8: Display final structure
 console.log('\n📂 Final extension structure:');
 function displayStructure(dir, prefix = '') {
   const items = fs.readdirSync(dir);
