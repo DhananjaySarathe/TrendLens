@@ -319,5 +319,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-
-ReactDOM.render(<App />, document.getElementById("root"));

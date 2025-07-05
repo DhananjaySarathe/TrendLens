@@ -56,6 +56,8 @@ if (fs.existsSync('content/overlay.css')) {
   fs.copyFileSync('content/overlay.css', path.join(contentDir, 'overlay.css'));
 }
 
+
+
 // Step 6: Copy public assets
 console.log('🖼️  Copying public assets...');
 if (fs.existsSync('public/icon.png')) {
