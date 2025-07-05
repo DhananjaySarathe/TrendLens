@@ -1,0 +1,29 @@
+/* Overlay styles for chart selection */
+#chart-selector-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.05);
+  z-index: 999999;
+  cursor: crosshair;
+  pointer-events: auto;
+}
+
+#selection-box {
+  position: absolute;
+  border: 2px dashed #333;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 1000000;
+  pointer-events: none;
+}
+
+/* Annotation canvas styles */
+.annotation-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000001;
+  pointer-events: none;
+} 

@@ -47,7 +47,14 @@ const popupDir = path.join(distDir, 'popup');
 fs.mkdirSync(popupDir, { recursive: true });
 fs.copyFileSync('popup/index.html', path.join(popupDir, 'index.html'));
 
-// Step 6: Copy public assets
+// Step 6: Copy content CSS files
+console.log('🎨 Copying content CSS files...');
+const contentDir = path.join(distDir, 'content');
+if (fs.existsSync('content/overlay.css')) {
+  fs.copyFileSync('content/overlay.css', path.join(contentDir, 'overlay.css'));
+}
+
+// Step 7: Copy public assets
 console.log('🖼️  Copying public assets...');
 const publicDir = path.join(distDir, 'public');
 fs.mkdirSync(publicDir, { recursive: true });
@@ -55,12 +62,13 @@ if (fs.existsSync('public/icon.png')) {
   fs.copyFileSync('public/icon.png', path.join(publicDir, 'icon.png'));
 }
 
-// Step 7: Verify build output
+// Step 8: Verify build output
 console.log('\n📁 Verifying build output...');
 const expectedFiles = [
   'manifest.json',
   'background.js',
   'content/overlay.js',
+  'content/overlay.css',
   'content/capture.js',
   'content/geminiAnalyzer.js',
   'popup/index.html',
@@ -83,7 +91,7 @@ if (missingFiles.length > 0) {
 
 console.log('✅ All expected files present');
 
-// Step 8: Display final structure
+// Step 9: Display final structure
 console.log('\n📂 Final extension structure:');
 function displayStructure(dir, prefix = '') {
   const items = fs.readdirSync(dir);
