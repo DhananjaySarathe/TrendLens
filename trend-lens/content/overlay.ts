@@ -1,27 +1,28 @@
-import html2canvas from "html2canvas";
+import { captureSelectedArea, CaptureArea } from "./capture";
 import { analyzeChartWithGemini } from "./geminiAnalyzer";
 import { drawAnnotations } from "../utils/drawAnnotations";
 
-(function injectOverlay() {
+(function injectOverlay(): void {
   if (document.getElementById("chart-selector-overlay")) return;
 
   const overlay = document.createElement("div");
   overlay.id = "chart-selector-overlay";
   Object.assign(overlay.style, {
     position: "fixed",
-    top: 0,
-    left: 0,
+    top: "0",
+    left: "0",
     width: "100vw",
     height: "100vh",
     backgroundColor: "rgba(0,0,0,0.05)",
-    zIndex: 999999,
-    cursor: "crosshair"
+    zIndex: "999999",
+    cursor: "crosshair",
   });
   document.body.appendChild(overlay);
 
-  let startX, startY, selection;
+  let startX: number, startY: number;
+  let selection: HTMLDivElement;
 
-  overlay.addEventListener("mousedown", (e) => {
+  overlay.addEventListener("mousedown", (e: MouseEvent) => {
     startX = e.pageX;
     startY = e.pageY;
 
@@ -33,36 +34,34 @@ import { drawAnnotations } from "../utils/drawAnnotations";
       background: "rgba(255,255,255,0.3)",
       left: `${startX}px`,
       top: `${startY}px`,
-      zIndex: 1000000
+      zIndex: "1000000",
     });
     overlay.appendChild(selection);
 
-    overlay.onmousemove = (e) => {
+    overlay.onmousemove = (e: MouseEvent) => {
       selection.style.width = `${e.pageX - startX}px`;
       selection.style.height = `${e.pageY - startY}px`;
     };
 
-    overlay.onmouseup = async (e) => {
+    overlay.onmouseup = async (e: MouseEvent) => {
       overlay.onmousemove = null;
       overlay.onmouseup = null;
 
       const endX = e.pageX;
       const endY = e.pageY;
 
-      html2canvas(document.body).then(async (canvas) => {
-        const ctx = canvas.getContext("2d");
-        const imgData = ctx.getImageData(startX, startY, endX - startX, endY - startY);
+      const captureArea: CaptureArea = {
+        startX,
+        startY,
+        endX,
+        endY,
+      };
 
-        const tempCanvas = document.createElement("canvas");
-        tempCanvas.width = imgData.width;
-        tempCanvas.height = imgData.height;
-        tempCanvas.getContext("2d").putImageData(imgData, 0, 0);
-
-        tempCanvas.toBlob(async (blob) => {
-          const results = await analyzeChartWithGemini(blob);
-          drawAnnotations(results, startX, startY);
-        });
-      });
+      const blob = await captureSelectedArea(captureArea);
+      if (blob) {
+        const results = await analyzeChartWithGemini(blob);
+        drawAnnotations(results, startX, startY);
+      }
 
       overlay.remove();
     };
