@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.js",
+    "build:extension": "node build-extension.js",
     "dev": "tsc --watch"
   },
   "dependencies": {

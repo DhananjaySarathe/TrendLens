@@ -50,7 +50,8 @@ trend-lens/
 │ └── icon.png
 ├── package.json
 ├── tsconfig.json
-└── build.js
+├── build.js          // Simple build script
+└── build-extension.js // Comprehensive build script
 ```
 
 ---
@@ -65,8 +66,8 @@ $ cd trend-lens
 # 2. Install dependencies
 $ npm install
 
-# 3. Build the extension
-$ npm run build
+# 3. Build the extension (comprehensive build)
+$ npm run build:extension
 
 # 4. Load in Chrome
 #   - Go to chrome://extensions
@@ -77,8 +78,35 @@ $ npm run build
 ---
 
 ## 🛠️ Development
-- **Build extension:** `npm run build` (outputs to `dist/`)
-- **Watch mode:** `npm run dev` (TypeScript compilation in watch mode)
+
+### Build Scripts
+- **`npm run build:extension`** - Complete build process with verification
+  - Cleans dist directory
+  - Compiles TypeScript to JavaScript
+  - Copies all necessary files
+  - Verifies build output
+  - Shows final folder structure
+- **`npm run build`** - Simple build (legacy)
+- **`npm run dev`** - TypeScript compilation in watch mode
+
+### Build Output
+After running `npm run build:extension`, your `dist/` folder will contain:
+```
+dist/
+├── manifest.json
+├── background.js
+├── content/
+│   ├── overlay.js
+│   ├── capture.js
+│   └── geminiAnalyzer.js
+├── popup/
+│   ├── index.html
+│   └── App.js
+├── utils/
+│   └── drawAnnotations.js
+└── public/
+    └── icon.png
+```
 
 ---
 
@@ -86,6 +114,7 @@ $ npm run build
 - All TypeScript files are compiled to JavaScript in the `dist/` folder
 - The build script copies `manifest.json`, popup HTML, and public assets
 - Test the extension by loading the `dist/` folder in Chrome as an unpacked extension
+- The build process verifies all required files are present
 
 ---
 
@@ -102,7 +131,7 @@ $ npm run build
 ### Core Files
 - `manifest.json` - Chrome extension configuration
 - `background.ts` - Service worker for extension lifecycle
-- `build.js` - Build script to compile and package extension
+- `build-extension.js` - Comprehensive build script with verification
 
 ### Content Scripts
 - `content/overlay.ts` - Creates selection overlay and handles user interaction
@@ -115,6 +144,26 @@ $ npm run build
 
 ### Utilities
 - `utils/drawAnnotations.ts` - Renders pattern annotations on screen
+
+---
+
+## 🔧 Troubleshooting
+
+### Common Issues
+1. **"Could not load JavaScript" errors** - Run `npm run build:extension` to ensure all files are compiled
+2. **Missing files in dist/** - The build script will verify and report any missing files
+3. **TypeScript compilation errors** - Check your TypeScript code for syntax errors
+
+### Build Verification
+The `build:extension` script automatically verifies that all required files are present:
+- ✅ manifest.json
+- ✅ background.js
+- ✅ content/overlay.js
+- ✅ content/capture.js
+- ✅ content/geminiAnalyzer.js
+- ✅ popup/index.html
+- ✅ popup/App.js
+- ✅ utils/drawAnnotations.js
 
 ---
 
