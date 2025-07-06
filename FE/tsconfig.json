@@ -11,7 +11,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
-    "outDir": "./dist",
+    "outDir": "dist",
     "rootDir": "./",
     "jsx": "react-jsx",
     "strict": true,
