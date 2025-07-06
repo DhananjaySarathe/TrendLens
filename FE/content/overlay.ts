@@ -1,6 +1,6 @@
 import { captureSelectedArea, CaptureArea } from "./capture";
-import { analyzeChartWithGemini } from "./geminiAnalyzer";
 import { drawAnnotations } from "../utils/drawAnnotations";
+import { analyzeChartWithGemini } from "./geminiAnalyzer";
 
 (function injectOverlay(): void {
   if (document.getElementById("chart-selector-overlay")) return;
@@ -19,51 +19,59 @@ import { drawAnnotations } from "../utils/drawAnnotations";
   });
   document.body.appendChild(overlay);
 
-  let startX: number, startY: number;
-  let selection: HTMLDivElement;
-
   overlay.addEventListener("mousedown", (e: MouseEvent) => {
-    startX = e.pageX;
-    startY = e.pageY;
+    const startX = e.pageX;
+    const startY = e.pageY;
 
-    selection = document.createElement("div");
+    const selection = document.createElement("div");
     selection.id = "selection-box";
     Object.assign(selection.style, {
       position: "absolute",
       border: "2px dashed #333",
       background: "rgba(255,255,255,0.3)",
-      left: `${startX}px`,
-      top: `${startY}px`,
       zIndex: "1000000",
     });
     overlay.appendChild(selection);
 
-    overlay.onmousemove = (e: MouseEvent) => {
-      selection.style.width = `${e.pageX - startX}px`;
-      selection.style.height = `${e.pageY - startY}px`;
-    };
+    function onMouseMove(e: MouseEvent) {
+      const currentX = e.pageX;
+      const currentY = e.pageY;
+      const left = Math.min(currentX, startX);
+      const top = Math.min(currentY, startY);
+      const width = Math.abs(currentX - startX);
+      const height = Math.abs(currentY - startY);
 
-    overlay.onmouseup = async (e: MouseEvent) => {
-      overlay.onmousemove = null;
-      overlay.onmouseup = null;
+      Object.assign(selection.style, {
+        left: `${left}px`,
+        top: `${top}px`,
+        width: `${width}px`,
+        height: `${height}px`,
+      });
+    }
+
+    async function onMouseUp(e: MouseEvent) {
+      overlay.removeEventListener("mousemove", onMouseMove);
+      overlay.removeEventListener("mouseup", onMouseUp);
 
       const endX = e.pageX;
       const endY = e.pageY;
-
       const captureArea: CaptureArea = {
-        startX,
-        startY,
-        endX,
-        endY,
+        startX: Math.min(startX, endX),
+        startY: Math.min(startY, endY),
+        endX: Math.max(startX, endX),
+        endY: Math.max(startY, endY),
       };
 
       const blob = await captureSelectedArea(captureArea);
       if (blob) {
         const results = await analyzeChartWithGemini(blob);
-        drawAnnotations(results, startX, startY);
+        drawAnnotations(results, captureArea.startX, captureArea.startY);
       }
 
       overlay.remove();
-    };
+    }
+
+    overlay.addEventListener("mousemove", onMouseMove);
+    overlay.addEventListener("mouseup", onMouseUp);
   });
 })();

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
 
 const GEMINI_KEY_STORAGE = "gemini_api_key";
 
@@ -45,6 +44,7 @@ const App: React.FC = () => {
   };
 
   const activateSelection = async (): Promise<void> => {
+    console.log("Activating selection... key pressed");
     try {
       const [tab] = await chrome.tabs.query({
         active: true,
@@ -259,9 +259,7 @@ const App: React.FC = () => {
           <h1 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent mb-2">
             TrendLens Ready
           </h1>
-          <p className="text-gray-400 text-sm">
-            Your Gemini AI is connected and ready to analyze charts
-          </p>
+          <p className="text-gray-400 text-sm">Testing name</p>
         </div>
 
         {/* Main Action */}

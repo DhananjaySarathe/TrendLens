@@ -7,10 +7,14 @@ export interface CaptureArea {
   endY: number;
 }
 
+/**
+ * Capture a rectangular area of the page as a Blob image.
+ */
 export async function captureSelectedArea(
   area: CaptureArea
 ): Promise<Blob | null> {
   try {
+    console.log("Capturing area:", area);
     const canvas = await html2canvas(document.body);
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
