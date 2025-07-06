@@ -94,6 +94,25 @@ if (missingFiles.length > 0) {
 
 console.log('✅ All expected files present');
 
+// Step 7.5: Clean up unwanted files
+console.log('🧹 Cleaning up unwanted files...');
+const unwantedFiles = ['.DS_Store'];
+function removeUnwantedFiles(dir) {
+  const items = fs.readdirSync(dir);
+  items.forEach(item => {
+    const itemPath = path.join(dir, item);
+    const stat = fs.statSync(itemPath);
+    
+    if (stat.isDirectory()) {
+      removeUnwantedFiles(itemPath);
+    } else if (unwantedFiles.includes(item)) {
+      fs.unlinkSync(itemPath);
+      console.log(`   Removed: ${path.relative(distDir, itemPath)}`);
+    }
+  });
+}
+removeUnwantedFiles(distDir);
+
 // Step 8: Display final structure
 console.log('\n📂 Final extension structure:');
 function displayStructure(dir, prefix = '') {
