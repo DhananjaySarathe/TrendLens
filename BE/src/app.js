@@ -1,8 +1,7 @@
-// app.js
 import express from 'express';
 import cors from 'cors';
 import analyzeRoutes from './routes/analyzeRoutes.js';
-import { checkRoutes  } from './controllers/checkRoutes.js'; // Import the check routes
+import { checkRoutes } from './controllers/checkRoutes.js'; // Import the check routes
 
 const app = express();
 
@@ -14,6 +13,8 @@ app.use(express.json());
 
 // Mount your analyze routes under /api
 app.use('/api', analyzeRoutes);
-app.use('/api', checkRoutes);
+
+// Call the function to get the router, then mount it
+app.use('/api', checkRoutes());
 
 export default app;
